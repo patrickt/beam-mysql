@@ -12,9 +12,10 @@ import           Database.MySQL.Base (Connection)
 import qualified Data.Aeson as A (Value, encode)
 import           Data.String
 import           Data.ByteString (ByteString)
+import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import           Data.ByteString.Builder.Scientific (scientificBuilder)
-import qualified Data.ByteString.Lazy as BL (toStrict)
+import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
 import           Data.Fixed
 import           Data.Int
 import           Data.Monoid (Monoid)
@@ -472,10 +473,21 @@ instance HasSqlValueSyntax MysqlValueSyntax T.Text where
         (\next doEscape before conn ->
              do escaped <- doEscape (TE.encodeUtf8 t)
                 next doEscape (before <> "'" <> byteString escaped <> "'") conn)
+        
 instance HasSqlValueSyntax MysqlValueSyntax TL.Text where
     sqlValueSyntax = sqlValueSyntax . TL.toStrict
+    
 instance HasSqlValueSyntax MysqlValueSyntax [Char] where
     sqlValueSyntax = sqlValueSyntax . T.pack
+
+instance HasSqlValueSyntax MysqlValueSyntax B.ByteString where
+  sqlValueSyntax t = MysqlValueSyntax $ MysqlSyntax
+       (\next doEscape before conn ->
+            do escaped <- doEscape t
+               next doEscape (before <> "'" <> byteString escaped <> "'") conn)
+
+instance HasSqlValueSyntax MysqlValueSyntax BL.ByteString where
+  sqlValueSyntax = sqlValueSyntax . BL.toStrict
 
 instance HasSqlValueSyntax MysqlValueSyntax Scientific where
     sqlValueSyntax = MysqlValueSyntax . emit . scientificBuilder
