@@ -42,7 +42,7 @@ import           Data.Scientific
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as TL
-import           Data.Time (LocalTime)
+import           Data.Time (LocalTime, UTCTime)
 import           Data.Word
 
 import           Network.URI
@@ -265,4 +265,5 @@ FROM_BACKEND_ROW(BL.ByteString)
 FROM_BACKEND_ROW(T.Text)
 FROM_BACKEND_ROW(TL.Text)
 FROM_BACKEND_ROW(LocalTime)
+FROM_BACKEND_ROW(UTCTime)
 FROM_BACKEND_ROW(A.Value)

@@ -124,6 +124,16 @@ instance FromField TS.Text where
 instance FromField TL.Text where
     fromField f d = fmap (TL.fromChunks . pure) (fromField f d)
 
+instance FromField UTCTime where
+    fromField = atto checkDate localTime
+      where
+        checkDate DateTime = True
+        checkDate _ = False
+
+        localTime = do
+          (day, time) <- dayAndTime
+          pure (localTimeToUTC utc (LocalTime day time))
+
 instance FromField LocalTime where
     fromField = atto checkDate localTime
       where
