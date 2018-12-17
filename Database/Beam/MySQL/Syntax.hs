@@ -145,10 +145,12 @@ instance IsSql92InsertValuesSyntax MysqlInsertValuesSyntax where
 instance IsSql92DeleteSyntax MysqlDeleteSyntax where
     type Sql92DeleteExpressionSyntax MysqlDeleteSyntax = MysqlExpressionSyntax
 
-    deleteStmt tbl where_ =
+    deleteStmt tbl Nothing where_ =
       MysqlDeleteSyntax $
       emit "DELETE FROM " <> mysqlIdentifier tbl <>
       maybe mempty (\where' -> emit " WHERE " <> fromMysqlExpression where') where_
+      
+    deleteStmt _ (Just _) _ = error "beam-mysql: unimplemented: DELETE with a table alias"
 
 instance IsSql92SelectSyntax MysqlSelectSyntax where
     type Sql92SelectSelectTableSyntax MysqlSelectSyntax = MysqlSelectTableSyntax
