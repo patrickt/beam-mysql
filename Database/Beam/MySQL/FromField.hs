@@ -35,6 +35,7 @@ import qualified Data.Text.Lazy as TL
 import           Data.Time
 import           Data.Typeable
 import           Data.Word
+import           System.IO.Unsafe
 
 import           Text.Printf
 
@@ -132,7 +133,8 @@ instance FromField UTCTime where
 
         localTime = do
           (day, time) <- dayAndTime
-          pure (localTimeToUTC utc (LocalTime day time))
+          let timezoneUnsafe = unsafePerformIO getCurrentTimeZone
+          pure (localTimeToUTC timezoneUnsafe (LocalTime day time))
 
 instance FromField LocalTime where
     fromField = atto checkDate localTime
